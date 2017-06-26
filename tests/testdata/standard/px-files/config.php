@@ -29,7 +29,7 @@ return call_user_func( function(){
 	/** パブリッシュ先ディレクトリパス */
 	$conf->path_publish_dir = './px-files/dist/';
 	/** 公開キャッシュディレクトリ */
-	$conf->public_cache_dir = '/caches/';
+	$conf->public_cache_dir = '/common/px_resources/';
 	/** リソースディレクトリ(各コンテンツに対して1:1で関連付けられる)のパス */
 	$conf->path_files = '{$dirname}/{$filename}_files/';
 	/** Contents Manifesto のパス */
@@ -176,15 +176,6 @@ return call_user_func( function(){
 		 // PX=phpinfo
 		'picklesFramework2\commands\phpinfo::register' ,
 
-		// PX=publish
-		'picklesFramework2\commands\publish::register('.json_encode(array(
-			'paths_ignore'=> array(
-				// パブリッシュ対象から常に除外するパスを設定する。
-				// (ここに設定されたパスは、動的なプレビューは可能)
-				'/sample_pages/no_publish/*'
-			)
-		)).')' ,
-
 	);
 
 	/**
@@ -196,6 +187,17 @@ return call_user_func( function(){
 		// PX=api
 		'picklesFramework2\commands\api::register' ,
 
+		// PX=publish
+		'picklesFramework2\commands\publish::register('.json_encode(array(
+			'paths_ignore'=> array(
+				// パブリッシュ対象から常に除外するパスを設定する。
+				// (ここに設定されたパスは、動的なプレビューは可能)
+				// '/sample_pages/no_publish/*'
+			)
+		)).')' ,
+
+		// PX=px2dthelper
+		'tomk79\pickles2\px2dthelper\main::register' ,
 	);
 
 
@@ -215,7 +217,13 @@ return call_user_func( function(){
 		'picklesFramework2\processors\autoindex\autoindex::exec' ,
 
 		// テーマ
-		'theme'=>'picklesFramework2\theme\theme::exec' ,
+		'theme'=>'tomk79\pickles2\multitheme\theme::exec('.json_encode([
+			'param_theme_switch'=>'THEME',
+			'cookie_theme_switch'=>'THEME',
+			'path_theme_collection'=>'./px-files/themes/',
+			'attr_bowl_name_by'=>'data-contents-area',
+			'default_theme_id'=>'pickles2'
+		]).')' ,
 
 		// Apache互換のSSIの記述を解決する
 		'picklesFramework2\processors\ssi\ssi::exec' ,

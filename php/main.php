@@ -15,6 +15,9 @@ class main{
 	/** Options */
 	private $options;
 
+	/** Error Messages */
+	private $errors;
+
 	/**
 	 * Constructor
 	 */
@@ -22,6 +25,9 @@ class main{
 		$this->path_entry_script = $path_entry_script;
 		$this->cms_settings = $cms_settings;
 		$this->options = $options;
+
+		// 初期化
+		$this->errors = array();
 
 		// CMS設定を整理
 		$this->cms_settings = json_decode( json_encode( $this->cms_settings ) );
@@ -50,7 +56,42 @@ class main{
 	 * @return boolean 実行結果の真偽
 	 */
 	public function execute(){
+
+		$project_info_all = $this->query('/?PX=px2dthelper.get.all', array(), $val);
+		$project_info_all = @json_decode($project_info_all);
+		if( !is_object($project_info_all) ){
+			$this->error('Failed to load project info from `/?PX=px2dthelper.get.all`.');
+			return false;
+		}
+		var_dump($project_info_all);
+
+		$sitemap = $this->query('/?PX=api.get.sitemap', array(), $val);
+		$sitemap = @json_decode($sitemap);
+		if( !is_object($sitemap) ){
+			$this->error('Failed to load sitemap list from `/?PX=px2dthelper.get.sitemap`.');
+			return false;
+		}
+		var_dump($sitemap);
+
 		return true;
+	}
+
+	/**
+	 * エラーメッセージを発行
+	 * @param  string $msg エラーメッセージ
+	 * @return boolean true
+	 */
+	private function error($msg){
+		array_push( $this->errors, $msg );
+		return true;
+	}
+
+	/**
+	 * エラーメッセージを発行
+	 * @return array エラーメッセージ一覧
+	 */
+	public function get_errors(){
+		return $this->errors;
 	}
 
 	/**

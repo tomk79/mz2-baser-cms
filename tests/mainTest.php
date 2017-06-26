@@ -34,6 +34,10 @@ class mainTest extends PHPUnit_Framework_TestCase{
 		$res = $mz2basercms->execute();
 		$this->assertTrue( $res );
 
+		$errors = $mz2basercms->get_errors();
+		$this->assertTrue( is_array($errors) );
+		$this->assertEquals( count($errors), 0 );
+
 		// 後始末
 		$mz2basercms->query('/?PX=clearcache', array(), $val);
 	} // testExecute()
