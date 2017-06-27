@@ -1,6 +1,21 @@
-# node-mz2-baser-cms
+# mz2-baser-cms
 Pickles 2 から baserCMS へデータをエクスポートします。
 
+## インストール - Install
+
+coming soon.
+
+## 使い方 - Usage
+
+```php
+<?php
+$mz2basercms = new \tomk79\pickles2\mz2_baser_cms\main( '/path/to/your/.px_execute.php' );
+$result = $mz2basercms->execute( './path/to/your/export.zip' );
+$errors = $mz2basercms->get_errors();
+
+var_dump($result); // <- Result (true, or false)
+var_dump($errors); // <- Error Messages
+```
 
 ## ライセンス - License
 

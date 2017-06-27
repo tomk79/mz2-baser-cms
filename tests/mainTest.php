@@ -31,7 +31,7 @@ class mainTest extends PHPUnit_Framework_TestCase{
 	public function testExecute(){
 		$mz2basercms = new \tomk79\pickles2\mz2_baser_cms\main( __DIR__.'/testdata/standard/.px_execute.php' );
 
-		$res = $mz2basercms->execute();
+		$res = $mz2basercms->execute( __DIR__.'/output/execute_test_001.zip' );
 		$this->assertTrue( $res );
 
 		$errors = $mz2basercms->get_errors();

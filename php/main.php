@@ -6,6 +6,9 @@ namespace tomk79\pickles2\mz2_baser_cms;
 
 class main{
 
+	/** Filesystem Utility */
+	private $fs;
+
 	/** Entry Script */
 	private $path_entry_script;
 
@@ -27,6 +30,7 @@ class main{
 		$this->options = $options;
 
 		// 初期化
+		$this->fs = new \tomk79\filesystem();
 		$this->errors = array();
 
 		// CMS設定を整理
@@ -55,7 +59,15 @@ class main{
 	 * 出力を実行する
 	 * @return boolean 実行結果の真偽
 	 */
-	public function execute(){
+	public function execute( $path_output ){
+		if( !strlen( $path_output ) || !is_string( $path_output ) ){
+			$this->error('Output path is required.');
+			return false;
+		}
+		if( !is_dir( dirname($path_output) ) ){
+			$this->error('Output directory is not exists.');
+			return false;
+		}
 
 		$project_info_all = $this->query('/?PX=px2dthelper.get.all', array(), $val);
 		$project_info_all = @json_decode($project_info_all);
@@ -63,7 +75,7 @@ class main{
 			$this->error('Failed to load project info from `/?PX=px2dthelper.get.all`.');
 			return false;
 		}
-		var_dump($project_info_all);
+		// var_dump($project_info_all);
 
 		$sitemap = $this->query('/?PX=api.get.sitemap', array(), $val);
 		$sitemap = @json_decode($sitemap);
@@ -71,9 +83,67 @@ class main{
 			$this->error('Failed to load sitemap list from `/?PX=px2dthelper.get.sitemap`.');
 			return false;
 		}
-		var_dump($sitemap);
+		// var_dump($sitemap);
+
+		// Temporary Directory
+		$path_tmp_dir = $project_info_all->realpath_homedir.'_sys/ram/caches/mz2-baser-cms-'.urlencode(date('Ymd-His')).'/';
+		// var_dump($path_tmp_dir);
+
+		// Template Directory
+		$path_template_dir = __DIR__.'/../zip_template/';
+
+		// 一旦雛形を展開
+		$this->fs->copy_r($path_template_dir, $path_tmp_dir.'exports/');
+
+		// Pickles 2 からデータを出力
+		// TODO: ここがメインの処理
+		var_dump('TODO: Pickles 2 からデータを出力');
+
+
+		// ZIPファイルに固める
+		$this->zip($path_tmp_dir.'exports/', $path_output);
 
 		return true;
+	}
+
+	/**
+	 * ZIPアーカイブを生成する
+	 * @return array 状態および成否情報
+	 */
+	public function zip($path_target_dir, $path_zip_to){
+		$rtn = array(
+			'result' => false,
+			'files' => 0,
+			'status' => null,
+		);
+
+		// 既存のZIPが存在する場合はファイルが追加されてしまうので、
+		// 一旦内容を消さなければいけない。
+		$this->fs->save_file($path_zip_to, '');
+
+		// ZipArchive オブジェクト生成
+		$zip = new \ZipArchive();
+		$filename = $path_zip_to;
+
+		if ($zip->open($filename, \ZipArchive::CREATE)!==TRUE) {
+			// exit("cannot open <$filename>\n");
+			return $rtn;
+		}
+
+		// 対象フォルダに移動して、ファイルを1つずつ追加する
+		$tmp_cd = realpath('.');
+		chdir($path_target_dir);
+		$filelist = glob("**/*");
+		foreach($filelist as $localpath){
+			$zip->addFile($localpath);
+		}
+		chdir($tmp_cd); // もとのディレクトリに帰る
+
+		$rtn['result'] = true;
+		$rtn['files'] = $zip->numFiles;
+		$rtn['status'] = $zip->status;
+		$zip->close();
+		return $rtn;
 	}
 
 	/**
