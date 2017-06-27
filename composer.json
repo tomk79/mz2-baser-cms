@@ -30,7 +30,9 @@
     },
     "autoload": {
         "files": [
-            "php/main.php"
+            "php/main.php",
+            "php/core.php",
+            "php/export/sitemap.php"
         ]
     }
 }

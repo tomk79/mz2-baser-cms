@@ -15,14 +15,15 @@ class mainTest extends PHPUnit_Framework_TestCase{
 	 * セットアップ状態の確認
 	 */
 	public function testSetup(){
+		$core = new \tomk79\pickles2\mz2_baser_cms\core( __DIR__.'/testdata/standard/.px_execute.php' );
 		$mz2basercms = new \tomk79\pickles2\mz2_baser_cms\main( __DIR__.'/testdata/standard/.px_execute.php' );
 
-		$res = $mz2basercms->query('/', array(), $val);
+		$res = $core->query('/', array(), $val);
 		// var_dump($res);
 		$this->assertEquals( gettype($res), gettype('') );
 
 		// 後始末
-		$mz2basercms->query('/?PX=clearcache', array(), $val);
+		$core->query('/?PX=clearcache', array(), $val);
 	} // testSetup()
 
 	/**
@@ -39,7 +40,8 @@ class mainTest extends PHPUnit_Framework_TestCase{
 		$this->assertEquals( count($errors), 0 );
 
 		// 後始末
-		$mz2basercms->query('/?PX=clearcache', array(), $val);
+		$core = new \tomk79\pickles2\mz2_baser_cms\core( __DIR__.'/testdata/standard/.px_execute.php' );
+		$core->query('/?PX=clearcache', array(), $val);
 	} // testExecute()
 
 }
