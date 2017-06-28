@@ -56,66 +56,36 @@ class core{
 	}
 
 	/**
+	 * Entry Script のパスを取得する
+	 * @return string Path to Entry Script.
+	 */
+	public function get_path_entry_script(){
+		return $this->path_entry_script;
+	}
+
+	/**
+	 * CMS設定を取得する
+	 * @return array Setting informations of target CMS.
+	 */
+	public function get_cms_settings(){
+		return $this->cms_settings;
+	}
+
+	/**
+	 * オプション情報を取得する
+	 * @return array Options.
+	 */
+	public function get_options(){
+		return $this->options;
+	}
+
+	/**
 	 * $fs を取得する
 	 * @return object `$fs`
 	 */
 	public function fs(){
         return $this->fs;
     }
-
-	/**
-	 * 出力を実行する
-	 * @return boolean 実行結果の真偽
-	 */
-	public function execute( $path_output ){
-		if( !strlen( $path_output ) || !is_string( $path_output ) ){
-			$this->error('Output path is required.');
-			return false;
-		}
-		if( !is_dir( dirname($path_output) ) ){
-			$this->error('Output directory is not exists.');
-			return false;
-		}
-
-		// Pickles 2 の環境情報を取得
-		$project_info_all = $this->query('/?PX=px2dthelper.get.all', array(), $val);
-		$project_info_all = @json_decode($project_info_all);
-		if( !is_object($project_info_all) ){
-			$this->error('Failed to load project info from `/?PX=px2dthelper.get.all`.');
-			return false;
-		}
-		// var_dump($project_info_all);
-
-		// Temporary Directory
-		$path_tmp_dir = $project_info_all->realpath_homedir.'_sys/ram/caches/mz2-baser-cms-'.urlencode(date('Ymd-His')).'/';
-		// var_dump($path_tmp_dir);
-
-		// Template Directory
-		$path_template_dir = __DIR__.'/../zip_template/';
-
-		// 一旦雛形を展開
-		$this->fs->copy_r($path_template_dir, $path_tmp_dir.'exports/');
-
-		// Pickles 2 からデータを出力
-		// TODO: ここがメインの処理
-		var_dump('TODO: Pickles 2 からデータを出力');
-
-		$sitemap = $this->query('/?PX=api.get.sitemap', array(), $val);
-		$sitemap = @json_decode($sitemap);
-		if( !is_object($sitemap) ){
-			$this->error('Failed to load sitemap list from `/?PX=px2dthelper.get.sitemap`.');
-			return false;
-		}
-		// var_dump($sitemap);
-
-		// $sitemap = new export_sitemap( $this->path_entry_script, $this->cms_settings, $this->options );
-
-
-		// ZIPファイルに固める
-		$this->zip($path_tmp_dir.'exports/', $path_output);
-
-		return true;
-	}
 
 	/**
 	 * ZIPアーカイブを生成する
@@ -187,7 +157,7 @@ class core{
 	 * 通常は 得られた標準出力をそのまま文字列として返します。
 	 * `output` オプションに `json` が指定された場合、 `json_decode()` された値が返却されます。
 	 */
-	public function query($request_path, $options = null, &$return_var = null){
+	public function px2query($request_path, $options = null, &$return_var = null){
 		if(!is_string($request_path)){
 			$this->error('Invalid argument supplied for 1st option $request_path in $px->internal_sub_request(). It required String value.');
 			return false;
@@ -239,6 +209,6 @@ class core{
 		}
 
 		return $bin;
-	} // query()
+	} // px2query()
 
 }

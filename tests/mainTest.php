@@ -18,12 +18,12 @@ class mainTest extends PHPUnit_Framework_TestCase{
 		$core = new \tomk79\pickles2\mz2_baser_cms\core( __DIR__.'/testdata/standard/.px_execute.php' );
 		$mz2basercms = new \tomk79\pickles2\mz2_baser_cms\main( __DIR__.'/testdata/standard/.px_execute.php' );
 
-		$res = $core->query('/', array(), $val);
+		$res = $core->px2query('/', array(), $val);
 		// var_dump($res);
 		$this->assertEquals( gettype($res), gettype('') );
 
 		// 後始末
-		$core->query('/?PX=clearcache', array(), $val);
+		$core->px2query('/?PX=clearcache', array(), $val);
 	} // testSetup()
 
 	/**
@@ -32,7 +32,7 @@ class mainTest extends PHPUnit_Framework_TestCase{
 	public function testExecute(){
 		$mz2basercms = new \tomk79\pickles2\mz2_baser_cms\main( __DIR__.'/testdata/standard/.px_execute.php' );
 
-		$res = $mz2basercms->execute( __DIR__.'/output/execute_test_001.zip' );
+		$res = $mz2basercms->export( __DIR__.'/output/execute_test_001.zip' );
 		$this->assertTrue( $res );
 
 		$errors = $mz2basercms->get_errors();
@@ -41,7 +41,7 @@ class mainTest extends PHPUnit_Framework_TestCase{
 
 		// 後始末
 		$core = new \tomk79\pickles2\mz2_baser_cms\core( __DIR__.'/testdata/standard/.px_execute.php' );
-		$core->query('/?PX=clearcache', array(), $val);
+		$core->px2query('/?PX=clearcache', array(), $val);
 	} // testExecute()
 
 }
