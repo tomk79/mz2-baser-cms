@@ -126,12 +126,23 @@ class export_sitemap{
 			return true;
 		}
 
+		$path_content = $this->core->px2query($page_info->path.'?PX=px2dthelper.find_page_content');
+		$realpath_content = $page_info_all->realpath_docroot.$page_info_all->path_controot.json_decode($path_content);
+		$src_content = '';
+		if( !is_file($realpath_content) ){
+			$src_content = '<p style="color:#f00;">404 - File NOT Exists.</p>';
+		}elseif( !is_readable($realpath_content) ){
+			$src_content = '<p style="color:#f00;">403 - File Exists, but NOT Readable.</p>';
+		}else{
+			$src_content = $this->core->fs()->read_file($realpath_content);
+		}
+
 		// --------------------------------------
 		// pages.csv 行作成
 		$pages_row = $this->row_template_pages;
 
 		$pages_row['id'] = $this->counter->get('pages', $page_info->path);
-		$pages_row['contents'] = '<p>開発中です。('.$page_info->id.' - '.$page_info->path.')</p>';
+		$pages_row['contents'] = $src_content;
 
 		// pages.csv 行完成
 		array_push($this->ary_pages, $pages_row );
