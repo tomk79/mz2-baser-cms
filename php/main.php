@@ -53,8 +53,8 @@ class main{
 		$this->core->fs()->copy_r($path_template_dir, $path_tmp_dir.'exports/');
 
 		// Pickles 2 からデータを出力
-		$sitemap = new export_sitemap( $this->core );
-		$sitemap->export($path_tmp_dir);
+		$export_sitemap = new export_sitemap( $this->core );
+		$export_sitemap->export($path_tmp_dir);
 
 
 		// ZIPファイルに固める
