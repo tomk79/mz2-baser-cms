@@ -2,7 +2,7 @@
 "/",,,"HOME",,,,,,1,"top",,,,,,
 "/testpage/test1.html",,,"TEST1",,,,,,1,,,,,1,,
 "/testpage/test1-1.html",,,"TEST1-1",,,,,"/testpage/test1.html",1,,,,,,,
-"/testpage/test1-2.html",,,"TEST1-2",,,,,"/testpage/test1.html",1,,,,,,,
+"/testpage/test1-2.html",,,"TEST1-2",,,,,"/testpage/test1.html>/testpage/test1-1.html",1,,,,,,,
 "/testpage/test2.html",,,"TEST2",,,,,,1,,,,,1,,
 "/testpage/test3.html",,,"TEST3",,,,,,1,,,,,1,,
 "/testpage/test4.html",,,"TEST4",,,,,,1,,,,,1,,

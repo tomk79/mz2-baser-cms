@@ -156,35 +156,47 @@ class export_sitemap{
 	private function add_new_content_folder( $page_info_all ){
 		$page_info = $page_info_all->page_info;
 
-		$path_dir = dirname($page_info->path);
-		$path_dir = preg_replace('/\\/*$/', '', $path_dir).'/';
-		if( $this->counter->is_exists('content_folders', 'ContentFolder::'.$path_dir) ){
+		$physical_dir_name = dirname($page_info->path);
+		$physical_dir_name = preg_replace('/\\/*$/', '', $physical_dir_name).'/';
+		if( $this->counter->is_exists('content_folders', 'ContentFolder::'.$physical_dir_name) ){
 			// 提議済みの場合
 			return true;
 		}
-		// var_dump($path_dir);
+		// var_dump($physical_dir_name);
 
-		$id_content_folders = $this->counter->get('content_folders', 'ContentFolder::'.$path_dir);
+		$id_content_folders = $this->counter->get('content_folders', 'ContentFolder::'.$physical_dir_name);
 
 		// --------------------------------------
 		// contents.csv 行作成
 		$contents_row = $this->row_template_contents;
 
-		$contents_row['id'] = $this->counter->get('contents', 'ContentFolder::'.$page_info->id);
+		$contents_row['id'] = $this->counter->get('contents', 'ContentFolder::'.$physical_dir_name);
 		$contents_row['name'] = basename(dirname($page_info->path));
 		$contents_row['plugin'] = 'Core';
 		$contents_row['type'] = 'ContentFolder';
-		$contents_row['url'] = $path_dir;
+		$contents_row['url'] = $physical_dir_name;
 		$contents_row['author_id'] = '1'; // admin？
 		$contents_row['status'] = '1';
 		$contents_row['self_status'] = '1';
 		$contents_row['site_id'] = '0';
 		$contents_row['title'] = $page_info->title;
-		$contents_row['site_root'] = ($path_dir=='/' ? '1' : '0');
+		$contents_row['site_root'] = ($physical_dir_name=='/' ? '1' : '0');
 		$contents_row['deleted'] = '0';
 		$contents_row['exclude_menu'] = '0';
 		$contents_row['blank_link'] = '0';
 		$contents_row['entity_id'] = $id_content_folders;
+
+		// パンくずの階層構造
+		// $parent_page_info = $this->core->px2query($page_info->path.'?PX=api.get.page_info&path='.urlencode($page_info_all->navigation_info->parent));
+		// $parent_page_info = json_decode($parent_page_info);
+
+		$physical_dir_name = dirname($page_info->path);
+		$physical_dir_name = preg_replace('/\\/*$/', '', $physical_dir_name).'/';
+		if($physical_dir_name != '/'){
+			$physical_dir_name = dirname($physical_dir_name);
+			$physical_dir_name = preg_replace('/\\/*$/', '', $physical_dir_name).'/';
+			$contents_row['parent_id'] = $this->counter->get('contents', 'ContentFolder::'.$physical_dir_name);
+		}
 
 		// contents.csv 行完成
 		array_push($this->ary_contents, $contents_row );
@@ -231,8 +243,6 @@ class export_sitemap{
 		// パンくずの階層構造
 		if( !strlen($page_info->id) ){
 			$contents_row['parent_id'] = '';
-		}elseif( !strlen($page_info->logical_path) ){
-			$contents_row['parent_id'] = '1';
 		}else{
 			$contents_row['parent_id'] = $this->counter->get('contents', 'Page::'.$page_info_all->navigation_info->parent);
 		}

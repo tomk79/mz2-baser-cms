@@ -13,13 +13,17 @@
     - Pickles 2 のサイトマップに相当するデータ。
     - ただし、フォルダという概念がある。物理階層を表している？
     - フォルダは、 `core/content_folders.csv` にリストされる。
-    - `core/contents.csv` の type=ContentFolder のとき、 entity_id で紐付いている。
+    - `core/contents.csv` の type=ContentFolder のとき、 `entity_id` で紐付いている。
 - `core/pages.csv`
     - Pickles 2 のコンテンツに相当するデータ。
-    - `core/contents.csv` で、type=Page のとき、entity_id で紐付いている。
+    - `core/contents.csv` で、type=Page のとき、 `entity_id` で紐付いている。
 - `core/users.csv`
     - ユーザー情報がハッシュ化されたパスワード付きで出力されてしまうので要注意。
 - `core/sites.csv`
     - スマホ用、ケータイ用、などの区別がある場合、ここに登録するらしい。
     - PC用ページは定義する必要がなく、 ID=0 とすると関連づく。
     - PC用ページしかない場合は、レコードを挿入しなくてよい。
+
+わからないこと。
+
+- コンテンツ一覧上にある フォルダ が、どういう概念かわからない。
