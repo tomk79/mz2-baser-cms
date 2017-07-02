@@ -105,12 +105,23 @@ class export_sitemap{
 		// 保存
 		$src_contents_csv = $this->core->fs()->mk_csv( $this->ary_contents );
 		$this->core->fs()->save_file( $path_contents_csv, $src_contents_csv );
+		$this->core->fs()->save_file( $path_output.'exports/bc_sample/Config/data/default/contents.csv', $src_contents_csv );
 
 		$src_pages_csv = $this->core->fs()->mk_csv( $this->ary_pages );
 		$this->core->fs()->save_file( $path_pages_csv, $src_pages_csv );
+		$this->core->fs()->save_file( $path_output.'exports/bc_sample/Config/data/default/pages.csv', $src_pages_csv );
 
 		$src_content_folders_csv = $this->core->fs()->mk_csv( $this->ary_content_folders );
 		$this->core->fs()->save_file( $path_content_folders_csv, $src_content_folders_csv );
+		$this->core->fs()->save_file( $path_output.'exports/bc_sample/Config/data/default/content_folders.csv', $src_content_folders_csv );
+
+		$config = '';
+		$config .= '<'.'?php'."\n";
+		$config .= '$title = \'Pickles 2 プロジェクトからのエクスポート\';'."\n";
+		$config .= '$description = \'Pickles 2 からエクスポートしたデータです。\';'."\n";
+		$config .= '$author = \'Tomoya Koyanagi\';'."\n";
+		$config .= '$url = \'http://pickles2.pxt.jp/\';'."\n";
+		$this->core->fs()->save_file( $path_output.'exports/bc_sample/config.php', $config );
 
 		return true;
 	}
