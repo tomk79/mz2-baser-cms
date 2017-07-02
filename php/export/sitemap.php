@@ -37,7 +37,7 @@ class export_sitemap{
 	public function export( $path_output ){
 		// contents.csv
 		// 提議行を雛形として読み込み
-		$path_contents_csv = $path_output.'exports/core/contents.csv';
+		$path_contents_csv = $path_output.'exports/export_data/core/contents.csv';
 		$this->ary_contents = $this->core->fs()->read_csv( $path_contents_csv, array('charset'=>'utf-8') );
 		$column_define_contents = $this->ary_contents[0];
 
@@ -50,7 +50,7 @@ class export_sitemap{
 
 		// pages.csv
 		// 提議行を雛形として読み込み
-		$path_pages_csv = $path_output.'exports/core/pages.csv';
+		$path_pages_csv = $path_output.'exports/export_data/core/pages.csv';
 		$this->ary_pages = $this->core->fs()->read_csv( $path_pages_csv, array('charset'=>'utf-8') );
 		$column_define_pages = $this->ary_pages[0];
 
@@ -63,7 +63,7 @@ class export_sitemap{
 
 		// content_folders.csv
 		// 提議行を雛形として読み込み
-		$path_content_folders_csv = $path_output.'exports/core/content_folders.csv';
+		$path_content_folders_csv = $path_output.'exports/export_data/core/content_folders.csv';
 		$this->ary_content_folders = $this->core->fs()->read_csv( $path_content_folders_csv, array('charset'=>'utf-8') );
 		$column_define_content_folders = $this->ary_content_folders[0];
 

@@ -58,7 +58,7 @@ class main{
 
 
 		// ZIPファイルに固める
-		$this->core->zip($path_tmp_dir.'exports/', $path_output);
+		$this->core->zip($path_tmp_dir.'exports/export_data/', $path_output);
 
 		return true;
 	}
