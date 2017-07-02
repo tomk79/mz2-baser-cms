@@ -1,0 +1,3 @@
+[submodule "submodules/basercms"]
+	path = submodules/basercms
+	url = https://github.com/baserproject/basercms.git

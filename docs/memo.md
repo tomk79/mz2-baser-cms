@@ -1,8 +1,12 @@
 # Pickles 2 から baserCMS へコンテンツを盛り付けるメモ
 
+## わかったこと
+
 やりながらbaserCMSに詳しくなってきたので、知ったことをメモします。
 
-- `<baserRoot>/admin/` で管理画面にアクセスできる。
+### 全般
+
+- `http://<baserRoot>/admin/` で管理画面にアクセスできる。
 - データのインポート/エクスポート機能が存在する。
     - Home > システム設定 > ユーティリティ > データメンテナンス
     - 「データのバックアップ」、「データの復元」 から操作
@@ -24,6 +28,12 @@
     - PC用ページは定義する必要がなく、 ID=0 とすると関連づく。
     - PC用ページしかない場合は、レコードを挿入しなくてよい。
 
-わからないこと。
+### テーマ
+
+- テーマには、[初期データ読込機能](https://github.com/baserproject/basercms-docs/blob/dev-4/%E6%A9%9F%E8%83%BD%E4%BB%95%E6%A7%98/090.%E3%83%86%E3%83%BC%E3%83%9E/%E5%88%9D%E6%9C%9F%E3%83%87%E3%83%BC%E3%82%BF%E8%AA%AD%E8%BE%BC%E6%A9%9F%E8%83%BD.md)がついている。コンテンツやページの一覧を含めることもできるらしい。
+- テーマは `<baserRoot>/theme/{$theme_name}/` にインストールする。 [baserMarket](https://market.basercms.net/) で購入しダウンロードしたテーマは、ここに置いたら認識された。
+    - `<baserRoot>/app/webroot/theme/{$theme_name}/` においてもOK？ 置き場所のルールは [ここ](https://github.com/baserproject/basercms-docs/blob/dev-4/%E6%A9%9F%E8%83%BD%E4%BB%95%E6%A7%98/090.%E3%83%86%E3%83%BC%E3%83%9E/%E7%AE%A1%E7%90%86%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%86%E3%83%BC%E3%83%9E.md) に書かれていた。
+
+## わからないこと
 
 - コンテンツ一覧上にある フォルダ が、どういう概念かわからない。
