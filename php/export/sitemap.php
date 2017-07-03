@@ -37,7 +37,7 @@ class export_sitemap{
 	public function export( $path_output ){
 		// contents.csv
 		// 提議行を雛形として読み込み
-		$path_contents_csv = $path_output.'exports/export_data/core/contents.csv';
+		$path_contents_csv = $path_output.'exports/pickles2_export/Config/data/default/contents.csv';
 		$this->ary_contents = $this->core->fs()->read_csv( $path_contents_csv, array('charset'=>'utf-8') );
 		$column_define_contents = $this->ary_contents[0];
 
@@ -50,7 +50,7 @@ class export_sitemap{
 
 		// pages.csv
 		// 提議行を雛形として読み込み
-		$path_pages_csv = $path_output.'exports/export_data/core/pages.csv';
+		$path_pages_csv = $path_output.'exports/pickles2_export/Config/data/default/pages.csv';
 		$this->ary_pages = $this->core->fs()->read_csv( $path_pages_csv, array('charset'=>'utf-8') );
 		$column_define_pages = $this->ary_pages[0];
 
@@ -63,7 +63,7 @@ class export_sitemap{
 
 		// content_folders.csv
 		// 提議行を雛形として読み込み
-		$path_content_folders_csv = $path_output.'exports/export_data/core/content_folders.csv';
+		$path_content_folders_csv = $path_output.'exports/pickles2_export/Config/data/default/content_folders.csv';
 		$this->ary_content_folders = $this->core->fs()->read_csv( $path_content_folders_csv, array('charset'=>'utf-8') );
 		$column_define_content_folders = $this->ary_content_folders[0];
 
@@ -105,23 +105,12 @@ class export_sitemap{
 		// 保存
 		$src_contents_csv = $this->core->fs()->mk_csv( $this->ary_contents );
 		$this->core->fs()->save_file( $path_contents_csv, $src_contents_csv );
-		$this->core->fs()->save_file( $path_output.'exports/bc_sample/Config/data/default/contents.csv', $src_contents_csv );
 
 		$src_pages_csv = $this->core->fs()->mk_csv( $this->ary_pages );
 		$this->core->fs()->save_file( $path_pages_csv, $src_pages_csv );
-		$this->core->fs()->save_file( $path_output.'exports/bc_sample/Config/data/default/pages.csv', $src_pages_csv );
 
 		$src_content_folders_csv = $this->core->fs()->mk_csv( $this->ary_content_folders );
 		$this->core->fs()->save_file( $path_content_folders_csv, $src_content_folders_csv );
-		$this->core->fs()->save_file( $path_output.'exports/bc_sample/Config/data/default/content_folders.csv', $src_content_folders_csv );
-
-		$config = '';
-		$config .= '<'.'?php'."\n";
-		$config .= '$title = \'Pickles 2 プロジェクトからのエクスポート\';'."\n";
-		$config .= '$description = \'Pickles 2 からエクスポートしたデータです。\';'."\n";
-		$config .= '$author = \'Tomoya Koyanagi\';'."\n";
-		$config .= '$url = \'http://pickles2.pxt.jp/\';'."\n";
-		$this->core->fs()->save_file( $path_output.'exports/bc_sample/config.php', $config );
 
 		return true;
 	}

@@ -47,7 +47,7 @@ class mainTest extends PHPUnit_Framework_TestCase{
 				continue;
 			}
 			$this->fs->copy_r(
-				$path_cache.$basename.'/exports/bc_sample/',
+				$path_cache.$basename.'/exports/pickles2_export/',
 				__DIR__.'/../submodules/basercms/app/webroot/theme/pickles2_export/'
 			);
 			break;
