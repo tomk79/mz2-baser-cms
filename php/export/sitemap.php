@@ -128,11 +128,14 @@ class export_sitemap{
 
 		$path_content = $this->core->px2query($page_info->path.'?PX=px2dthelper.find_page_content');
 		$realpath_content = $page_info_all->realpath_docroot.$page_info_all->path_controot.json_decode($path_content);
+		$realpath_content = $this->core->fs()->get_realpath($realpath_content);
 		$src_content = '';
 		if( !is_file($realpath_content) ){
 			$src_content = '<p style="color:#f00;">404 - File NOT Exists.</p>';
+			$src_content .= '<p style="color:#f00;">'.htmlspecialchars($realpath_content).'</p>';
 		}elseif( !is_readable($realpath_content) ){
 			$src_content = '<p style="color:#f00;">403 - File Exists, but NOT Readable.</p>';
+			$src_content .= '<p style="color:#f00;">'.htmlspecialchars($realpath_content).'</p>';
 		}else{
 			$src_content = $this->core->fs()->read_file($realpath_content);
 		}
@@ -185,6 +188,7 @@ class export_sitemap{
 		$contents_row['exclude_menu'] = '0';
 		$contents_row['blank_link'] = '0';
 		$contents_row['entity_id'] = $id_content_folders;
+		$contents_row['layout_template'] = 'default';
 
 		// パンくずの階層構造
 		// $parent_page_info = $this->core->px2query($page_info->path.'?PX=api.get.page_info&path='.urlencode($page_info_all->navigation_info->parent));
@@ -222,30 +226,38 @@ class export_sitemap{
 		$contents_row = $this->row_template_contents;
 		$contents_row['id'] = $this->counter->get('contents', 'Page::'.$page_info->id);
 		$contents_row['name'] = basename($page_info->path);
+		if( $contents_row['name'] == 'index.html' ){
+			$contents_row['name'] = 'index'; // `index` は特別な名前。親フォルダと一体化する。
+		}
 		$contents_row['plugin'] = 'Core';
 		$contents_row['type'] = 'Page';
 		$contents_row['url'] = $page_info->path;
+		$contents_row['url'] = preg_replace('/\/index\.html$/', '/index', $contents_row['url']); // `index.html` は `index` に丸める
 		$contents_row['author_id'] = '1'; // admin？
 		$contents_row['status'] = '1';
 		$contents_row['self_status'] = '1';
 		$contents_row['site_id'] = '0';
 		$contents_row['title'] = $page_info->title;
 		$contents_row['description'] = $page_info->description;
-		$contents_row['site_root'] = (!strlen($page_info->id) ? '1' : '0');
+		// $contents_row['site_root'] = (!strlen($page_info->id) ? '1' : '0');
+		$contents_row['site_root'] = '0';
 		$contents_row['deleted'] = '0';
 		$contents_row['exclude_menu'] = '0';
 		$contents_row['blank_link'] = '0';
+
+		// `layout_template`
+		// レイアウトテンプレート のこと。
+		// テーマフォルダの `<theme>/Layouts/{$layout_template}.php` に関連付けられる。
+		$contents_row['layout_template'] = 'default';
 
 		// コンテンツのID
 		// pages.csv のIDに紐づく
 		$contents_row['entity_id'] = $this->counter->get('pages', $page_info->path);
 
 		// パンくずの階層構造
-		if( !strlen($page_info->id) ){
-			$contents_row['parent_id'] = '';
-		}else{
-			$contents_row['parent_id'] = $this->counter->get('contents', 'Page::'.$page_info_all->navigation_info->parent);
-		}
+		$physical_dir_name = dirname($page_info->path);
+		$physical_dir_name = preg_replace('/\\/*$/', '', $physical_dir_name).'/';
+		$contents_row['parent_id'] = $this->counter->get('contents', 'ContentFolder::'.$physical_dir_name);
 
 		// contents.csv 行完成
 		array_push($this->ary_contents, $contents_row );
