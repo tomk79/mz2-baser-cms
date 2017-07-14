@@ -43,7 +43,7 @@ class main{
 		// var_dump($project_info_all);
 
 		// Temporary Directory
-		$path_tmp_dir = $project_info_all->realpath_homedir.'_sys/ram/caches/mz2-baser-cms-'.urlencode(date('Ymd-His')).'/';
+		$path_tmp_dir = $project_info_all->realpath_homedir.'_sys/ram/caches/mz2-baser-cms-'.urlencode(@date('Ymd-His')).'/';
 		// var_dump($path_tmp_dir);
 
 		// Template Directory
