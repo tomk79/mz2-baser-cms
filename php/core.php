@@ -96,6 +96,7 @@ class core{
 			'result' => false,
 			'files' => 0,
 			'status' => null,
+			'message' => null,
 		);
 
 		// 既存のZIPが存在する場合はファイルが追加されてしまうので、
@@ -107,15 +108,16 @@ class core{
 		$filename = $path_zip_to;
 
 		if ($zip->open($filename, \ZipArchive::CREATE)!==TRUE) {
-			// exit("cannot open <$filename>\n");
+			$rtn['message'] = 'cannot open '.$filename;
 			return $rtn;
 		}
 
 		// 対象フォルダに移動して、ファイルを1つずつ追加する
 		$tmp_cd = realpath('.');
 		chdir($path_target_dir);
-		$filelist = glob("**/*");
+		$filelist = $this->zip_mk_filelist_r();
 		foreach($filelist as $localpath){
+			// var_dump($localpath);
 			$zip->addFile($localpath);
 		}
 		chdir($tmp_cd); // もとのディレクトリに帰る
@@ -123,7 +125,29 @@ class core{
 		$rtn['result'] = true;
 		$rtn['files'] = $zip->numFiles;
 		$rtn['status'] = $zip->status;
+		$rtn['message'] = 'success.';
 		$zip->close();
+		return $rtn;
+	}
+	/**
+	 * ZIP対象のファイルリストを生成する
+	 * @param  string $cd current directory.
+	 * @return array 生成したリスト
+	 */
+	private function zip_mk_filelist_r( $cd = null ){
+		$rtn = array();
+		if( is_null( $cd ) ){
+			$cd = './';
+		}
+		$ls = $this->fs->ls( $cd );
+		foreach( $ls as $filename ){
+			if( is_dir($cd.$filename) ){
+				array_push( $rtn, $cd.$filename.'/' );
+				$rtn = array_merge( $rtn, $this->zip_mk_filelist_r( $cd.$filename.'/' ) );
+			}elseif( is_file($cd.$filename) ){
+				array_push( $rtn, $cd.$filename );
+			}
+		}
 		return $rtn;
 	}
 
