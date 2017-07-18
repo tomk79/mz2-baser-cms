@@ -189,6 +189,7 @@ class export_sitemap{
 		$contents_row['blank_link'] = '0';
 		$contents_row['entity_id'] = $id_content_folders;
 		$contents_row['layout_template'] = 'default';
+		$contents_row['level'] = $this->get_level($contents_row['url']);
 
 		// パンくずの階層構造
 		// $parent_page_info = $this->core->px2query($page_info->path.'?PX=api.get.page_info&path='.urlencode($page_info_all->navigation_info->parent));
@@ -244,6 +245,7 @@ class export_sitemap{
 		$contents_row['deleted'] = '0';
 		$contents_row['exclude_menu'] = '0';
 		$contents_row['blank_link'] = '0';
+		$contents_row['level'] = $this->get_level($contents_row['url']);
 
 		// `layout_template`
 		// レイアウトテンプレート のこと。
@@ -264,6 +266,17 @@ class export_sitemap{
 
 
 		return true;
+	}
+
+	/**
+	 * url を参照して level 値を生成する
+	 * @param  string $url urlカラムの値
+	 * @return int level 値
+	 */
+	private function get_level($url){
+		$url = preg_replace('/\/+$/', '', $url);
+		$path_ary = explode('/', $url);
+		return count($path_ary)-1;
 	}
 
 }
