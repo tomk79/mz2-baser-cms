@@ -6,8 +6,12 @@ class mainTest extends PHPUnit_Framework_TestCase{
 	private $fs;
 
 	public function setup(){
+		clearstatcache();
 		mb_internal_encoding('UTF-8');
 		$this->fs = new tomk79\filesystem();
+		if( !is_dir( __DIR__.'/output/' ) ){
+			$this->fs->mkdir( __DIR__.'/output/' );
+		}
 	}
 
 
@@ -27,6 +31,18 @@ class mainTest extends PHPUnit_Framework_TestCase{
 	} // testSetup()
 
 	/**
+	 * ZIP圧縮のテスト
+	 */
+	public function testZip(){
+		$core = new \tomk79\pickles2\mz2_baser_cms\core( __DIR__.'/testdata/standard/.px_execute.php' );
+		$res = $core->zip(__DIR__.'/../php/', __DIR__.'/output/ziptest_001.zip' );
+		// var_dump($res);
+		$this->assertTrue( $res['result'] );
+		$this->assertTrue( is_file(__DIR__.'/output/ziptest_001.zip') );
+	} // testZip()
+
+
+	/**
 	 * 出力を実行
 	 */
 	public function testExecute(){
@@ -39,7 +55,8 @@ class mainTest extends PHPUnit_Framework_TestCase{
 		$this->assertTrue( is_array($errors) );
 		$this->assertEquals( count($errors), 0 );
 
-		// (仮)出力されたテーマを試験環境にコピー
+
+		// TODO: (仮)出力されたテーマを試験環境にコピー
 		$path_cache = __DIR__.'/testdata/standard/px-files/_sys/ram/caches/';
 		$files = $this->fs->ls($path_cache);
 		foreach( $files as $basename ){
@@ -52,10 +69,6 @@ class mainTest extends PHPUnit_Framework_TestCase{
 			);
 			break;
 		}
-
-		// 後始末
-		$core = new \tomk79\pickles2\mz2_baser_cms\core( __DIR__.'/testdata/standard/.px_execute.php' );
-		$core->px2query('/?PX=clearcache', array(), $val);
 	} // testExecute()
 
 }

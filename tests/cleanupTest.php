@@ -2,7 +2,7 @@
 /**
  * test for tomk79/mz2-baser-cms
  */
-class zipTest extends PHPUnit_Framework_TestCase{
+class cleanupTest extends PHPUnit_Framework_TestCase{
 	private $fs;
 
 	public function setup(){
@@ -12,17 +12,13 @@ class zipTest extends PHPUnit_Framework_TestCase{
 
 
 	/**
-	 * ZIP圧縮のテスト
+	 * 後始末
 	 */
-	public function testZip(){
+	public function testCleanup(){
 		$core = new \tomk79\pickles2\mz2_baser_cms\core( __DIR__.'/testdata/standard/.px_execute.php' );
-
-		$res = $core->zip(__DIR__.'/../php/', __DIR__.'/output/ziptest_001.zip' );
-		// var_dump($res);
-		$this->assertTrue( $res['result'] );
-
-		// 後始末
 		$core->px2query('/?PX=clearcache', array(), $val);
-	} // testZip()
+
+		$this->fs->rm( __DIR__.'/output/' );
+	} // testCleanup()
 
 }

@@ -99,6 +99,19 @@ class core{
 			'message' => null,
 		);
 
+		if( !is_dir( dirname($path_zip_to) ) ){
+			$rtn['message'] = 'Parent directory is not exists.';
+			return $rtn;
+		}
+		if( !is_file( $path_zip_to) && !is_writable( dirname($path_zip_to) ) ){
+			$rtn['message'] = 'Parent directory is not writable.';
+			return $rtn;
+		}
+		if( is_file( $path_zip_to) && !is_writable( $path_zip_to ) ){
+			$rtn['message'] = 'File exists, but not writable.';
+			return $rtn;
+		}
+
 		// 既存のZIPが存在する場合はファイルが追加されてしまうので、
 		// 一旦内容を消さなければいけない。
 		$this->fs->save_file($path_zip_to, '');
