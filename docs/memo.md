@@ -17,6 +17,7 @@
     - Pickles 2 のサイトマップに相当するデータ。
     - ただし、フォルダという概念がある。(後述)
     - レイアウトテンプレート は `layout_template` のこと。テーマフォルダの `<theme>/Layouts/{$layout_template}.php` に関連付けられる。
+    - `lft` と `rght` の両フィールドは、パンくずのツリー構造の表現に関係している。 [入れ子集合モデル](http://www.geocities.jp/mickindex/database/db_tree_ns.html) の左端と右端の値を格納する。
 - `core/pages.csv`
     - Pickles 2 のコンテンツに相当するデータ。
     - `core/contents.csv` で、type=Page のとき、 `entity_id` で紐付いている。

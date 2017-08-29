@@ -22,12 +22,16 @@ class export_sitemap{
 	private $row_template_pages;
 	private $row_template_content_folders;
 
+	/** bread crumb */
+	private $breadcrumb;
+
 	/**
 	 * Constructor
 	 */
 	public function __construct( $core ){
 		$this->core = $core;
 		$this->counter = new utils_counter();
+		$this->breadcrumb = array();
 	}
 
 	/**
@@ -74,32 +78,13 @@ class export_sitemap{
 		$this->ary_content_folders = array();
 		array_push($this->ary_content_folders, $column_define_content_folders );
 
+		// パンくずメモを処理
+		$this->breadcrumb = array();
 
 		// --------------------------------------
-
-		// サイトマップ配列を取得
-		$sitemap = $this->core->px2query('/?PX=api.get.sitemap', array(), $val);
-		$sitemap = @json_decode($sitemap);
-		if( !is_object($sitemap) ){
-			$this->core->error('Failed to load sitemap list from `/?PX=px2dthelper.get.sitemap`.');
+		// ページツリーを処理
+		if( !$this->apply_page_tree_recursive( null ) ){
 			return false;
-		}
-
-		// --------------------------------------
-
-		foreach($sitemap as $page_info){
-
-			// --------------------------------------
-			// contents.csv 行作成
-			$contents_row = $this->row_template_contents;
-
-			$page_info_all = $this->core->px2query($page_info->path.'?PX=px2dthelper.get.all');
-			$page_info_all = json_decode($page_info_all);
-			// var_dump($page_info_all);
-
-			$this->add_new_content_folder( $page_info_all );
-			$this->add_new_page( $page_info_all );
-			$this->add_new_content( $page_info_all );
 		}
 
 		// 保存
@@ -111,6 +96,45 @@ class export_sitemap{
 
 		$src_content_folders_csv = $this->core->fs()->mk_csv( $this->ary_content_folders );
 		$this->core->fs()->save_file( $path_content_folders_csv, $src_content_folders_csv );
+
+		return true;
+	}
+
+	/**
+	 * ページツリーを再帰的に処理する
+	 */
+	private function apply_page_tree_recursive( $page_path = null ){
+		if( is_null( $page_path ) ){
+			$page_path = '/';
+		}
+
+		$page_info_all = $this->core->px2query($page_path.'?PX=px2dthelper.get.all&filter=false');
+		$page_info_all = json_decode($page_info_all);
+
+		// var_dump($page_info_all->navigation_info->children_info);
+
+		// var_dump($page_info_all->page_info);
+		array_push( $this->breadcrumb, array(
+			'id'=>$page_info_all->page_info->id,
+			'path'=>$page_info_all->page_info->path,
+			'idx'=>null
+		) );
+
+		$this->add_new_content_folder( $page_info_all );
+		// var_dump($this->breadcrumb);
+		$this->add_new_page( $page_info_all );
+		$this->add_new_content( $page_info_all );
+
+		foreach( $page_info_all->navigation_info->children_info as $child_page_info ){
+			$this->apply_page_tree_recursive($child_page_info->path);
+		}
+
+		// 入れ子木構造の処理
+		$parent_content_idx = @$this->breadcrumb[count($this->breadcrumb)-1]['idx'];
+		if( !is_null($parent_content_idx) ){
+			$this->ary_contents[$parent_content_idx]['rght'] = $this->counter->get('nested_tree_coordinate');
+		}
+		array_pop( $this->breadcrumb );
 
 		return true;
 	}
@@ -203,6 +227,11 @@ class export_sitemap{
 			$contents_row['parent_id'] = $this->counter->get('contents', 'ContentFolder::'.$physical_dir_name);
 		}
 
+		// 入れ子木構造
+		$contents_row['lft'] = $this->counter->get('nested_tree_coordinate');
+		$this->breadcrumb[count($this->breadcrumb)-1]['idx'] = count($this->ary_contents);
+		// $contents_row['rght'] = $this->counter->get('nested_tree_coordinate');
+
 		// contents.csv 行完成
 		array_push($this->ary_contents, $contents_row );
 
@@ -218,6 +247,7 @@ class export_sitemap{
 
 	/**
 	 * Content を追加する
+	 * Content は、 Pickles 2 の page に当たる一覧。
 	 */
 	private function add_new_content( $page_info_all ){
 		$page_info = $page_info_all->page_info;
@@ -260,6 +290,10 @@ class export_sitemap{
 		$physical_dir_name = dirname($page_info->path);
 		$physical_dir_name = preg_replace('/\\/*$/', '', $physical_dir_name).'/';
 		$contents_row['parent_id'] = $this->counter->get('contents', 'ContentFolder::'.$physical_dir_name);
+
+		// 入れ子木構造
+		$contents_row['lft'] = $this->counter->get('nested_tree_coordinate');
+		$contents_row['rght'] = $this->counter->get('nested_tree_coordinate');
 
 		// contents.csv 行完成
 		array_push($this->ary_contents, $contents_row );

@@ -84,8 +84,8 @@ class core{
 	 * @return object `$fs`
 	 */
 	public function fs(){
-        return $this->fs;
-    }
+		return $this->fs;
+	}
 
 	/**
 	 * ZIPアーカイブを生成する
