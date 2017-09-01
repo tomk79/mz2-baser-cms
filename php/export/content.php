@@ -113,6 +113,36 @@ class export_content{
 			return $path;
 		}
 		// var_dump($path);
+
+		// var_dump($this->page_info_all);
+		// var_dump($this->page_info_all->page_info);
+		$realpath_resource = null;
+		if( preg_match( '/^\//', $path ) ){
+			$realpath_resource = $this->core->fs()->get_realpath($this->page_info_all->realpath_docroot.$this->page_info_all->path_controot.$path);
+		}else{
+			$realpath_resource = $this->core->fs()->get_realpath($this->page_info_all->realpath_docroot.$this->page_info_all->path_controot.dirname($this->page_info_all->page_info->content).'/'.$path);
+		}
+		// var_dump($realpath_resource);
+		if( !is_file( $realpath_resource ) || !is_readable( $realpath_resource ) ){
+			return $path;
+		}
+
+		preg_match('/\.(.*?)$/', $realpath_resource, $matched);
+		$ext = @strtolower($matched[1]);
+		$mime = null;
+		switch($ext){
+			case 'png':
+				$mime = 'image/png'; break;
+			case 'gif':
+				$mime = 'image/gif'; break;
+			case 'jpg': case 'jpe': case 'jpeg':
+				$mime = 'image/jpeg'; break;
+		}
+
+		$bin = $this->core->fs()->read_file( $realpath_resource );
+		$path = 'data:'.$mime.';base64,'.base64_encode($bin);
+		// var_dump($path);
+
 		return $path;
 	}
 	/**
