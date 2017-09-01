@@ -32,8 +32,10 @@
         "files": [
             "php/main.php",
             "php/core.php",
+            "php/export/content.php",
             "php/export/sitemap.php",
-            "php/utils/counter.php"
+            "php/utils/counter.php",
+            "php/utils/simple_html_dom.php"
         ]
     }
 }

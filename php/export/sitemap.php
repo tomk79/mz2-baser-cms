@@ -141,6 +141,7 @@ class export_sitemap{
 
 	/**
 	 * Page を追加する
+	 * Page は、 Pickles 2 でいう Content を格納するテーブルです。
 	 */
 	private function add_new_page( $page_info_all ){
 		$page_info = $page_info_all->page_info;
@@ -150,32 +151,79 @@ class export_sitemap{
 			return true;
 		}
 
-		$path_content = $this->core->px2query($page_info->path.'?PX=px2dthelper.find_page_content');
-		$realpath_content = $page_info_all->realpath_docroot.$page_info_all->path_controot.json_decode($path_content);
-		$realpath_content = $this->core->fs()->get_realpath($realpath_content);
-		$src_content = '';
-		if( !is_file($realpath_content) ){
-			$src_content = '<p style="color:#f00;">404 - File NOT Exists.</p>';
-			$src_content .= '<p style="color:#f00;">'.htmlspecialchars($realpath_content).'</p>';
-		}elseif( !is_readable($realpath_content) ){
-			$src_content = '<p style="color:#f00;">403 - File Exists, but NOT Readable.</p>';
-			$src_content .= '<p style="color:#f00;">'.htmlspecialchars($realpath_content).'</p>';
-		}else{
-			$src_content = $this->core->fs()->read_file($realpath_content);
-		}
-
-		// --------------------------------------
-		// pages.csv 行作成
-		$pages_row = $this->row_template_pages;
-
-		$pages_row['id'] = $this->counter->get('pages', $page_info->path);
-		$pages_row['contents'] = $src_content;
+		$content_operator = new export_content( $this->core, $this->row_template_pages, $page_info_all );
+		$pages_row = $content_operator->export();
+		$pages_row['id'] = $this->counter->get('pages', $page_info->path); // IDは `$counter` から発番
 
 		// pages.csv 行完成
 		array_push($this->ary_pages, $pages_row );
 
 		return true;
 	}
+
+	/**
+	 * 変換後の新しいパスを取得
+	 */
+	private function get_new_path( $path ){
+		var_dump($path);
+		if( preg_match( '/^(?:[a-zA-Z0-9]+\:|\/\/|\#)/', $path ) ){
+			return $path;
+		}
+		return $path;
+	}
+	/**
+	 * CSSファイル中のパスを解決
+	 */
+	private function path_resolve_in_css( $bin ){
+
+		$rtn = '';
+
+		// url()
+		while( 1 ){
+			if( !preg_match( '/^(.*?)url\s*\\((.*?)\\)(.*)$/si', $bin, $matched ) ){
+				$rtn .= $bin;
+				break;
+			}
+			$rtn .= $matched[1];
+			$rtn .= 'url("';
+			$res = trim( $matched[2] );
+			if( preg_match( '/^(\"|\')(.*)\1$/si', $res, $matched2 ) ){
+				$res = trim( $matched2[2] );
+			}
+			$res = $this->get_new_path( $res );
+			$rtn .= $res;
+			$rtn .= '")';
+			$bin = $matched[3];
+		}
+
+		// @import
+		$bin = $rtn;
+		$rtn = '';
+		while( 1 ){
+			if( !preg_match( '/^(.*?)@import\s*([^\s\;]*)(.*)$/si', $bin, $matched ) ){
+				$rtn .= $bin;
+				break;
+			}
+			$rtn .= $matched[1];
+			$rtn .= '@import ';
+			$res = trim( $matched[2] );
+			if( !preg_match('/^url\s*\(/', $res) ){
+				$rtn .= '"';
+				if( preg_match( '/^(\"|\')(.*)\1$/si', $res, $matched2 ) ){
+					$res = trim( $matched2[2] );
+				}
+				$res = $this->get_new_path( $res );
+				$rtn .= $res;
+				$rtn .= '"';
+			}else{
+				$rtn .= $res;
+			}
+			$bin = $matched[3];
+		}
+
+		return $rtn;
+	}
+
 
 	/**
 	 * Content Folder を追加する
