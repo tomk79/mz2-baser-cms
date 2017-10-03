@@ -35,6 +35,15 @@ class core{
 
 		// CMS設定を整理
 		$this->cms_settings = json_decode( json_encode( $this->cms_settings ) );
+		if( !@is_object($this->cms_settings) ){
+			$this->cms_settings = json_decode('{}');
+		}
+		if( !@strlen($this->cms_settings->local_resource_mode) ){
+			// 画像などのコンテンツ個別リソースをどう出力するか？
+			// embed = dataスキーマに変換して埋め込む (デフォルト)
+			// theme_files = テーマディレクトリの files フォルダに出力する (ただし、出力後手動でファイル格納フォルダに設置しなおす必要あり)
+			$this->cms_settings->local_resource_mode = "embed";
+		}
 
 		// オプション値を整理
 		$this->options = json_decode( json_encode( $this->options ) );

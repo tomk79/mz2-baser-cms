@@ -12,6 +12,9 @@ class export_sitemap{
 	/** Counter Object */
 	private $counter;
 
+	/** 出力先ディレクトリ */
+	private $realpath_output;
+
 	/** Data Array */
 	private $ary_contents;
 	private $ary_pages;
@@ -38,10 +41,12 @@ class export_sitemap{
 	 * 出力を実行する
 	 * @return boolean 実行結果の真偽
 	 */
-	public function export( $path_output ){
+	public function export( $realpath_output ){
+		$this->realpath_output = $realpath_output;
+
 		// contents.csv
 		// 提議行を雛形として読み込み
-		$path_contents_csv = $path_output.'exports/pickles2_export/Config/data/default/contents.csv';
+		$path_contents_csv = $this->realpath_output.'exports/pickles2_export/Config/data/default/contents.csv';
 		$this->ary_contents = $this->core->fs()->read_csv( $path_contents_csv, array('charset'=>'utf-8') );
 		$column_define_contents = $this->ary_contents[0];
 
@@ -54,7 +59,7 @@ class export_sitemap{
 
 		// pages.csv
 		// 提議行を雛形として読み込み
-		$path_pages_csv = $path_output.'exports/pickles2_export/Config/data/default/pages.csv';
+		$path_pages_csv = $this->realpath_output.'exports/pickles2_export/Config/data/default/pages.csv';
 		$this->ary_pages = $this->core->fs()->read_csv( $path_pages_csv, array('charset'=>'utf-8') );
 		$column_define_pages = $this->ary_pages[0];
 
@@ -67,7 +72,7 @@ class export_sitemap{
 
 		// content_folders.csv
 		// 提議行を雛形として読み込み
-		$path_content_folders_csv = $path_output.'exports/pickles2_export/Config/data/default/content_folders.csv';
+		$path_content_folders_csv = $this->realpath_output.'exports/pickles2_export/Config/data/default/content_folders.csv';
 		$this->ary_content_folders = $this->core->fs()->read_csv( $path_content_folders_csv, array('charset'=>'utf-8') );
 		$column_define_content_folders = $this->ary_content_folders[0];
 
@@ -151,7 +156,7 @@ class export_sitemap{
 			return true;
 		}
 
-		$content_operator = new export_content( $this->core, $this->row_template_pages, $page_info_all );
+		$content_operator = new export_content( $this->core, $this->realpath_output, $this->row_template_pages, $page_info_all );
 		$pages_row = $content_operator->export();
 		$pages_row['id'] = $this->counter->get('pages', $page_info->path); // IDは `$counter` から発番
 

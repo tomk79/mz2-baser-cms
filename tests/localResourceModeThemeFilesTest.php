@@ -2,7 +2,7 @@
 /**
  * test for tomk79/mz2-baser-cms
  */
-class mainTest extends PHPUnit_Framework_TestCase{
+class localResourceModeThemeFilesTest extends PHPUnit_Framework_TestCase{
 	private $fs;
 
 	public function setup(){
@@ -16,39 +16,12 @@ class mainTest extends PHPUnit_Framework_TestCase{
 
 
 	/**
-	 * セットアップ状態の確認
-	 */
-	public function testSetup(){
-		$core = new \tomk79\pickles2\mz2_baser_cms\core( __DIR__.'/testdata/standard/.px_execute.php' );
-		$mz2basercms = new \tomk79\pickles2\mz2_baser_cms\main( __DIR__.'/testdata/standard/.px_execute.php' );
-
-		$res = $core->px2query('/', array(), $val);
-		// var_dump($res);
-		$this->assertEquals( gettype($res), gettype('') );
-
-		// 後始末
-		$core->px2query('/?PX=clearcache', array(), $val);
-	} // testSetup()
-
-	/**
-	 * ZIP圧縮のテスト
-	 */
-	public function testZip(){
-		$core = new \tomk79\pickles2\mz2_baser_cms\core( __DIR__.'/testdata/standard/.px_execute.php' );
-		$res = $core->zip(__DIR__.'/../php/', __DIR__.'/output/ziptest_001.zip' );
-		// var_dump($res);
-		$this->assertTrue( $res['result'] );
-		$this->assertTrue( is_file(__DIR__.'/output/ziptest_001.zip') );
-	} // testZip()
-
-
-	/**
 	 * 出力を実行
 	 */
 	public function testExecute(){
-		$mz2basercms = new \tomk79\pickles2\mz2_baser_cms\main( __DIR__.'/testdata/standard/.px_execute.php' );
+		$mz2basercms = new \tomk79\pickles2\mz2_baser_cms\main( __DIR__.'/testdata/standard/.px_execute.php', array('local_resource_mode'=>'theme_files') );
 
-		$res = $mz2basercms->export( __DIR__.'/output/execute_test_001.zip' );
+		$res = $mz2basercms->export( __DIR__.'/output/execute_test_002.zip' );
 		$this->assertTrue( $res );
 
 		$errors = $mz2basercms->get_errors();
@@ -77,12 +50,12 @@ class mainTest extends PHPUnit_Framework_TestCase{
 	 */
 	public function testUnzip(){
 		$zip = new \ZipArchive;
-		if ($zip->open( __DIR__.'/output/execute_test_001.zip' ) === true) {
-			$zip->extractTo( __DIR__.'/output/unzip_execute_test_001.zip/' );
+		if ($zip->open( __DIR__.'/output/execute_test_002.zip' ) === true) {
+			$zip->extractTo( __DIR__.'/output/unzip_execute_test_002.zip/' );
 			$zip->close();
 		}
-		$this->assertTrue( is_dir(__DIR__.'/output/unzip_execute_test_001.zip/') );
-		$this->assertTrue( is_file(__DIR__.'/output/unzip_execute_test_001.zip/pickles2_export/Config/data/default/contents.csv') );
+		$this->assertTrue( is_dir(__DIR__.'/output/unzip_execute_test_002.zip/') );
+		$this->assertTrue( is_file(__DIR__.'/output/unzip_execute_test_002.zip/pickles2_export/Config/data/default/contents.csv') );
 	} // testUnzip()
 
 
@@ -90,7 +63,7 @@ class mainTest extends PHPUnit_Framework_TestCase{
 	 * contents.csv の内容をチェック
 	 */
 	public function testContentsCsv(){
-		$contentsCsv = $this->fs->read_csv( __DIR__.'/output/unzip_execute_test_001.zip/pickles2_export/Config/data/default/contents.csv' );
+		$contentsCsv = $this->fs->read_csv( __DIR__.'/output/unzip_execute_test_002.zip/pickles2_export/Config/data/default/contents.csv' );
 		// var_dump($contentsCsv);
 		$this->assertTrue( is_array($contentsCsv) );
 		$this->assertEquals( count($contentsCsv), 13 );
@@ -116,7 +89,7 @@ class mainTest extends PHPUnit_Framework_TestCase{
 	 * content_folders.csv の内容をチェック
 	 */
 	public function testContentFoldersCsv(){
-		$contentFoldersCsv = $this->fs->read_csv( __DIR__.'/output/unzip_execute_test_001.zip/pickles2_export/Config/data/default/content_folders.csv' );
+		$contentFoldersCsv = $this->fs->read_csv( __DIR__.'/output/unzip_execute_test_002.zip/pickles2_export/Config/data/default/content_folders.csv' );
 		// var_dump($contentFoldersCsv);
 		$this->assertTrue( is_array($contentFoldersCsv) );
 		$this->assertEquals( count($contentFoldersCsv), 4 );
@@ -130,7 +103,7 @@ class mainTest extends PHPUnit_Framework_TestCase{
 	 * pages.csv の内容をチェック
 	 */
 	public function testPagesCsv(){
-		$pagesCsv = $this->fs->read_csv( __DIR__.'/output/unzip_execute_test_001.zip/pickles2_export/Config/data/default/pages.csv' );
+		$pagesCsv = $this->fs->read_csv( __DIR__.'/output/unzip_execute_test_002.zip/pickles2_export/Config/data/default/pages.csv' );
 		// var_dump($pagesCsv);
 		$this->assertTrue( is_array($pagesCsv) );
 		$this->assertEquals( count($pagesCsv), 10 );
@@ -138,7 +111,9 @@ class mainTest extends PHPUnit_Framework_TestCase{
 		$this->assertEquals( $pagesCsv[9][0], 9 );
 		$this->assertEquals( $pagesCsv[9][1], '<p style="color:#f00;">404 - File NOT Exists.</p><p style="color:#f00;">'.htmlspecialchars( $this->fs->get_realpath(__DIR__.'/testdata/standard/testpage4/test4-2.html') ).'</p>' );
 
-		$this->assertFalse( $this->fs->is_dir( __DIR__.'/output/unzip_execute_test_001.zip/pickles2_export/files/pages/' ) );
+		$this->assertTrue( $this->fs->is_dir( __DIR__.'/output/unzip_execute_test_002.zip/pickles2_export/files/pages/' ) );
+		$this->assertTrue( $this->fs->is_file( __DIR__.'/output/unzip_execute_test_002.zip/pickles2_export/files/pages/common/images/sample_image.png' ) );
+		$this->assertTrue( $this->fs->is_file( __DIR__.'/output/unzip_execute_test_002.zip/pickles2_export/files/pages/testpage1/index_files/sample_image.jpg' ) );
 	} // testPagesCsv()
 
 }

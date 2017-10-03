@@ -9,6 +9,9 @@ class export_content{
 	/** Core Object */
 	private $core;
 
+	/** 出力先ディレクトリ */
+	private $realpath_output;
+
 	/** Row Templates */
 	private $row_template_pages;
 
@@ -18,8 +21,9 @@ class export_content{
 	/**
 	 * Constructor
 	 */
-	public function __construct( $core, $row_template_pages, $page_info_all ){
+	public function __construct( $core, $realpath_output, $row_template_pages, $page_info_all ){
 		$this->core = $core;
+		$this->realpath_output = $realpath_output;
 		$this->row_template_pages = $row_template_pages;
 		$this->page_info_all = $page_info_all;
 
@@ -110,20 +114,21 @@ class export_content{
 	 */
 	private function get_new_resource_path( $path ){
 		if( preg_match( '/^(?:[a-zA-Z0-9]+\:|\/\/|\#)/', $path ) ){
+			// http://, https:// などスキーマ名から始まっていた場合、変換しない
 			return $path;
 		}
-		// var_dump($path);
 
-		// var_dump($this->page_info_all);
-		// var_dump($this->page_info_all->page_info);
-		$realpath_resource = null;
+		$path_resource = null;
 		if( preg_match( '/^\//', $path ) ){
-			$realpath_resource = $this->core->fs()->get_realpath($this->page_info_all->realpath_docroot.$this->page_info_all->path_controot.$path);
+			// 絶対パスの記述
+			$path_resource = $this->core->fs()->get_realpath($this->page_info_all->path_controot.$path);
 		}else{
-			$realpath_resource = $this->core->fs()->get_realpath($this->page_info_all->realpath_docroot.$this->page_info_all->path_controot.dirname($this->page_info_all->page_info->content).'/'.$path);
+			// 相対パスの記述
+			$path_resource = $this->core->fs()->get_realpath($this->page_info_all->path_controot.dirname($this->page_info_all->page_info->content).'/'.$path);
 		}
-		// var_dump($realpath_resource);
+		$realpath_resource = $this->core->fs()->get_realpath($this->page_info_all->realpath_docroot.$path_resource);
 		if( !is_file( $realpath_resource ) || !is_readable( $realpath_resource ) ){
+			// ファイルの実体が存在しない場合、変換しないで返す
 			return $path;
 		}
 
@@ -139,9 +144,14 @@ class export_content{
 				$mime = 'image/jpeg'; break;
 		}
 
-		$bin = $this->core->fs()->read_file( $realpath_resource );
-		$path = 'data:'.$mime.';base64,'.base64_encode($bin);
-		// var_dump($path);
+		$cms_settings = $this->core->get_cms_settings();
+		if( $cms_settings->local_resource_mode == 'theme_files' ){
+			$this->core->fs()->copy_r( $realpath_resource, $this->realpath_output.'exports/pickles2_export/files/pages/'.$path_resource );
+			$path = '/pages'.$path_resource;
+		}else{
+			$bin = $this->core->fs()->read_file( $realpath_resource );
+			$path = 'data:'.$mime.';base64,'.base64_encode($bin);
+		}
 
 		return $path;
 	}
