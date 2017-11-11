@@ -111,9 +111,9 @@ class localResourceModeThemeFilesTest extends PHPUnit_Framework_TestCase{
 		$this->assertEquals( $pagesCsv[9][0], 9 );
 		$this->assertEquals( $pagesCsv[9][1], '<p style="color:#f00;">404 - File NOT Exists.</p><p style="color:#f00;">'.htmlspecialchars( $this->fs->get_realpath(__DIR__.'/testdata/standard/testpage4/test4-2.html') ).'</p>' );
 
-		$this->assertTrue( $this->fs->is_dir( __DIR__.'/output/unzip_execute_test_002.zip/pickles2_export/files/pages/' ) );
-		$this->assertTrue( $this->fs->is_file( __DIR__.'/output/unzip_execute_test_002.zip/pickles2_export/files/pages/common/images/sample_image.png' ) );
-		$this->assertTrue( $this->fs->is_file( __DIR__.'/output/unzip_execute_test_002.zip/pickles2_export/files/pages/testpage1/index_files/sample_image.jpg' ) );
+		$this->assertTrue( $this->fs->is_dir( __DIR__.'/output/unzip_execute_test_002.zip/pickles2_export/files/bgeditor/img/' ) );
+		$this->assertTrue( $this->fs->is_file( __DIR__.'/output/unzip_execute_test_002.zip/pickles2_export/files/bgeditor/img/pages___-__common__-__images__-__sample_image.png' ) );
+		$this->assertTrue( $this->fs->is_file( __DIR__.'/output/unzip_execute_test_002.zip/pickles2_export/files/bgeditor/img/pages___-__testpage1__-__index_files__-__sample_image.jpg' ) );
 	} // testPagesCsv()
 
 }

@@ -126,11 +126,14 @@ class export_content{
 			// 相対パスの記述
 			$path_resource = $this->core->fs()->get_realpath($this->page_info_all->path_controot.dirname($this->page_info_all->page_info->content).'/'.$path);
 		}
+		$path_resource = $this->core->fs()->normalize_path($path_resource);
 		$realpath_resource = $this->core->fs()->get_realpath($this->page_info_all->realpath_docroot.$path_resource);
+		$realpath_resource = $this->core->fs()->normalize_path($realpath_resource);
 		if( !is_file( $realpath_resource ) || !is_readable( $realpath_resource ) ){
 			// ファイルの実体が存在しない場合、変換しないで返す
 			return $path;
 		}
+
 
 		preg_match('/\.(.*?)$/', $realpath_resource, $matched);
 		$ext = @strtolower($matched[1]);
@@ -146,8 +149,9 @@ class export_content{
 
 		$cms_settings = $this->core->get_cms_settings();
 		if( $cms_settings->local_resource_mode == 'theme_files' ){
-			$this->core->fs()->copy_r( $realpath_resource, $this->realpath_output.'exports/pickles2_export/files/pages/'.$path_resource );
-			$path = '/pages'.$path_resource;
+			$path_resource_burger = 'pages_'.preg_replace('/\//s', '__-__', $path_resource); // ディレクトリに階層を持てないので、
+			$this->core->fs()->copy_r( $realpath_resource, $this->realpath_output.'exports/pickles2_export/files/bgeditor/img/'.$path_resource_burger );
+			$path = '/files/bgeditor/img/'.$path_resource_burger;
 		}else{
 			$bin = $this->core->fs()->read_file( $realpath_resource );
 			$path = 'data:'.$mime.';base64,'.base64_encode($bin);

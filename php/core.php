@@ -140,7 +140,9 @@ class core{
 		$filelist = $this->zip_mk_filelist_r();
 		foreach($filelist as $localpath){
 			// var_dump($localpath);
-			$zip->addFile($localpath);
+			if (file_exists($localpath) && is_file($localpath)){
+				$zip->addFile($localpath);
+			}
 		}
 		chdir($tmp_cd); // もとのディレクトリに帰る
 
