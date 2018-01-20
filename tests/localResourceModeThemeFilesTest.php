@@ -66,7 +66,7 @@ class localResourceModeThemeFilesTest extends PHPUnit_Framework_TestCase{
 		$contentsCsv = $this->fs->read_csv( __DIR__.'/output/unzip_execute_test_002.zip/pickles2_export/Config/data/default/contents.csv' );
 		// var_dump($contentsCsv);
 		$this->assertTrue( is_array($contentsCsv) );
-		$this->assertEquals( count($contentsCsv), 13 );
+		$this->assertEquals( count($contentsCsv), 17 );
 
 		$this->assertEquals( $contentsCsv[9][0], 9 );
 		$this->assertEquals( $contentsCsv[9][2], "testpage4" );
@@ -92,7 +92,7 @@ class localResourceModeThemeFilesTest extends PHPUnit_Framework_TestCase{
 		$contentFoldersCsv = $this->fs->read_csv( __DIR__.'/output/unzip_execute_test_002.zip/pickles2_export/Config/data/default/content_folders.csv' );
 		// var_dump($contentFoldersCsv);
 		$this->assertTrue( is_array($contentFoldersCsv) );
-		$this->assertEquals( count($contentFoldersCsv), 4 );
+		$this->assertEquals( count($contentFoldersCsv), 5 );
 
 		$this->assertEquals( $contentFoldersCsv[1][0], 1 );
 
@@ -106,7 +106,7 @@ class localResourceModeThemeFilesTest extends PHPUnit_Framework_TestCase{
 		$pagesCsv = $this->fs->read_csv( __DIR__.'/output/unzip_execute_test_002.zip/pickles2_export/Config/data/default/pages.csv' );
 		// var_dump($pagesCsv);
 		$this->assertTrue( is_array($pagesCsv) );
-		$this->assertEquals( count($pagesCsv), 10 );
+		$this->assertEquals( count($pagesCsv), 13 );
 
 		$this->assertEquals( $pagesCsv[9][0], 9 );
 		$this->assertEquals( $pagesCsv[9][1], '<p style="color:#f00;">404 - File NOT Exists.</p><p style="color:#f00;">'.htmlspecialchars( $this->fs->get_realpath(__DIR__.'/testdata/standard/testpage4/test4-2.html') ).'</p>' );
