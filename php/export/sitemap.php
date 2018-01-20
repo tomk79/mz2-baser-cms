@@ -19,11 +19,13 @@ class export_sitemap{
 	private $ary_contents;
 	private $ary_pages;
 	private $ary_content_folders;
+	private $ary_px2_bcs;
 
 	/** Row Templates */
 	private $row_template_contents;
 	private $row_template_pages;
 	private $row_template_content_folders;
+	private $row_template_px2_bcs;
 
 	/** bread crumb */
 	private $breadcrumb;
@@ -83,6 +85,21 @@ class export_sitemap{
 		$this->ary_content_folders = array();
 		array_push($this->ary_content_folders, $column_define_content_folders );
 
+		// px2_bcs.csv
+		// px2_bcsには、カスタムカラムの情報を出力します。
+		// カスタムカラムは Pickles 2 のサイトマップをスキャンして全量を把握するので、
+		// 内容を生成し終わるまで定義列の仕様を確定できません。
+		$path_px2_bcs_csv = $this->realpath_output.'exports/pickles2_export/Config/data/default/px2_bcs.csv';
+		$this->ary_px2_bcs = $this->core->fs()->read_csv( $path_px2_bcs_csv, array('charset'=>'utf-8') );
+		$column_define_px2_bcs = $this->ary_px2_bcs[0];
+
+		$this->ary_px2_bcs = array();
+		foreach($column_define_px2_bcs as $column_name){
+			$this->row_template_px2_bcs[$column_name] = null;
+		}
+		$this->ary_px2_bcs = array();
+		array_push($this->ary_px2_bcs, $column_define_px2_bcs );
+
 		// パンくずメモを処理
 		$this->breadcrumb = array();
 
@@ -101,6 +118,9 @@ class export_sitemap{
 
 		$src_content_folders_csv = $this->core->fs()->mk_csv( $this->ary_content_folders );
 		$this->core->fs()->save_file( $path_content_folders_csv, $src_content_folders_csv );
+
+		$src_px2_bcs_csv = $this->core->fs()->mk_csv( $this->ary_px2_bcs );
+		$this->core->fs()->save_file( $path_px2_bcs_csv, $src_px2_bcs_csv );
 
 		return true;
 	}
@@ -126,6 +146,7 @@ class export_sitemap{
 		) );
 
 		$this->add_new_content_folder( $page_info_all );
+		$this->add_new_px2_bcs( $page_info_all );
 		// var_dump($this->breadcrumb);
 		$this->add_new_page( $page_info_all );
 		$this->add_new_content( $page_info_all );
@@ -297,6 +318,64 @@ class export_sitemap{
 		array_push($this->ary_content_folders, $content_folders_row );
 		return true;
 	}
+
+
+	/**
+	 * Px2-Bcs を追加する
+	 */
+	private function add_new_px2_bcs( $page_info_all ){
+		$page_info = $page_info_all->page_info;
+
+		// --------------------------------------
+		// px2_bcs.csv 行作成
+		$px2_bcs_row = $this->row_template_px2_bcs;
+		$px2_bcs_row['id'] = $this->counter->get('px2_bcs', 'Px2Bc::'.$page_info->id);
+		$px2_bcs_row['model'] = 'Page';
+		$px2_bcs_row['entity_id'] = $this->counter->get('contents', 'Page::'.$page_info->id);// pages.csv のIDに紐づく
+		$px2_bcs_row['modified'] = null;
+		$px2_bcs_row['created'] = null;
+
+		$default_column_names = array(
+			'path',
+			'content',
+			'id',
+			'title',
+			'title_breadcrumb',
+			'title_h1',
+			'title_label',
+			'title_full',
+			'logical_path',
+			'list_flg',
+			'layout',
+			'orderby',
+			'keywords',
+			'description',
+			'category_top_flg',
+			'role',
+			'proc_type',
+		);
+
+		foreach($page_info as $column_name=>$column_value){
+			if(array_search( $column_name, $default_column_names ) !== false){
+				// これらはカスタムカラムではない
+				continue;
+			}
+
+			$custom_column_num = $this->counter->get('custom_column', 'customColumnName::'.$column_name);
+			if(!array_key_exists('exc_'.$custom_column_num, $this->row_template_px2_bcs)){
+				array_push($this->ary_px2_bcs[0], 'exc_'.$custom_column_num);
+				$this->row_template_px2_bcs['exc_'.$custom_column_num] = null;
+			}
+			$px2_bcs_row['exc_'.$custom_column_num] = $column_value;
+		}
+
+		// px2_bcs.csv 行完成
+		array_push($this->ary_px2_bcs, $px2_bcs_row );
+
+
+		return true;
+	}
+
 
 	/**
 	 * Content を追加する
