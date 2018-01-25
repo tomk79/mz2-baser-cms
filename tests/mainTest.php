@@ -145,7 +145,7 @@ class mainTest extends PHPUnit_Framework_TestCase{
 	 * px2_bcs.csv の内容をチェック
 	 */
 	public function testPx2BcsCsv(){
-		$px2bcsCsv = $this->fs->read_csv( __DIR__.'/output/unzip_execute_test_001.zip/pickles2_export/Px2Bc/px2_bcs.csv' );
+		$px2bcsCsv = $this->fs->read_csv( __DIR__.'/output/unzip_execute_test_001.zip/pickles2_export/Config/data/default/Px2Bc/px2_bcs.csv' );
 		// var_dump($px2bcsCsv);
 		$this->assertTrue( is_array($px2bcsCsv) );
 		$this->assertEquals( count($px2bcsCsv), 13 );
